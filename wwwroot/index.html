@@ -1,4 +1,90 @@
-<script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NexShop</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+</head>
+<body>
+  <nav></nav>
+
+  <div id="tickerTrack"></div>
+
+  <button id="cartBtn">Cart <span id="cartCount" style="display:none"></span></button>
+
+  <div id="megaMenu">
+    <div id="megaProducts"></div>
+  </div>
+
+  <div class="section">
+    <select id="sortSelect">
+      <option value="featured">Featured</option>
+      <option value="price_asc">Price: Low to High</option>
+      <option value="price_desc">Price: High to Low</option>
+      <option value="rating">Top Rated</option>
+      <option value="newest">Newest</option>
+    </select>
+
+    <button class="filter-chip active" data-filter="all">All</button>
+    <button class="filter-chip" data-filter="Clothing">Clothing</button>
+    <button class="filter-chip" data-filter="Footwear">Footwear</button>
+    <button class="filter-chip" data-filter="Accessories">Accessories</button>
+    <button class="filter-chip" data-filter="Beauty">Beauty</button>
+    <button class="filter-chip" data-filter="Tech">Tech</button>
+
+    <div id="productsGrid"></div>
+  </div>
+
+  <div id="cartOverlay"></div>
+  <aside id="cartDrawer">
+    <button id="cartClose">Close</button>
+    <div id="cartEmpty">Your cart is empty.</div>
+    <div id="cartItems"></div>
+    <div id="cartRecs">
+      <div id="cartRecGrid"></div>
+    </div>
+    <div id="cartFooter">
+      <div>Subtotal: <span id="cartSubtotal">$0.00</span></div>
+      <div>Shipping: <span id="cartShipping">$0.00</span></div>
+      <div>Total: <span id="cartTotal">$0.00</span></div>
+    </div>
+  </aside>
+
+  <section>
+    <div id="tierName"></div>
+    <div id="pointsText"></div>
+    <div id="pointsNext"></div>
+    <div id="loyaltyBadges"></div>
+    <div style="width:100%;height:8px;background:#ddd;">
+      <div id="loyaltyProgressFill" style="height:8px;width:0;background:#999;"></div>
+    </div>
+  </section>
+
+  <button id="aiChatBtn">AI Chat</button>
+  <div id="aiChatPanel">
+    <div id="aiMessages"></div>
+    <input id="aiInput" />
+    <button id="aiSend">Send</button>
+  </div>
+
+  <button id="quizBtn">Quiz</button>
+  <button id="openQuiz">Open Quiz</button>
+  <div id="quizOverlay">
+    <button id="closeQuiz">Close</button>
+    <div id="step1" class="active"></div>
+    <div id="step2"></div>
+    <div id="step3"></div>
+    <div id="step4"></div>
+    <div id="quizProgress" style="width:25%;height:8px;background:#999;"></div>
+  </div>
+
+  <div id="cursor"></div>
+  <div id="cursor-dot"></div>
+
+  <!-- paste your script block here -->
+  <script>
 gsap.registerPlugin(ScrollTrigger);
 
 const state = {
@@ -849,3 +935,5 @@ window.openCart = openCart;
 window.closeCart = closeCart;
 window.sendAiMessage = sendAiMessage;
 </script>
+</body>
+</html>
