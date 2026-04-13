@@ -1,18 +1,49 @@
+using System.Text.Json;
 using NexShop.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    });
+
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new() { Title = "NexShop API", Version = "v1" }); });
-builder.Services.AddHttpClient();
+builder.Services.AddSwaggerGen();
+builder.Services.AddHttpClient("Anthropic", client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(20);
+});
+
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(policy =>
-        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+    options.AddPolicy("Frontend", policy =>
+    {
+        policy
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowAnyOrigin();
+    });
 });
 
 var app = builder.Build();
+
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        context.Response.StatusCode = 500;
+        context.Response.ContentType = "application/json";
+
+        var response = new
+        {
+            error = "An unexpected server error occurred."
+        };
+
+        await context.Response.WriteAsync(JsonSerializer.Serialize(response));
+    });
+});
 
 if (app.Environment.IsDevelopment())
 {
@@ -20,10 +51,18 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors();
+app.UseDefaultFiles();
 app.UseStaticFiles();
+
 app.UseRouting();
+app.UseCors("Frontend");
+
 app.MapControllers();
-app.MapFallbackToFile("index.html");
+
+app.MapGet("/api/health", () => Results.Ok(new
+{
+    status = "ok",
+    productCount = SeedData.GetProducts().Count
+}));
 
 app.Run();
