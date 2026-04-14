@@ -1,19 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="stylesheet" href="style.css">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NexShop</title>
+  <link rel="stylesheet" href="style.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 </head>
 <body>
-  <nav></nav>
+  <nav>
+    <div>NEXSHOP</div>
+    <button id="cartBtn">Cart <span id="cartCount" style="display:none"></span></button>
+  </nav>
 
   <div id="tickerTrack"></div>
 
-  <button id="cartBtn">Cart <span id="cartCount" style="display:none"></span></button>
+  <header class="hero">
+    <div class="hero-inner">
+      <p class="hero-kicker">AI-LUXURY COMMERCE</p>
+      <h1 class="hero-title">NexShop</h1>
+      <p class="hero-subtitle">
+        A curated AI showroom for fashion, tech, beauty, and modern essentials.
+      </p>
+    </div>
+  </header>
 
   <div id="megaMenu">
     <div id="megaProducts"></div>
@@ -38,14 +49,40 @@
     <div id="productsGrid"></div>
   </div>
 
+  <section class="loyalty-wrap">
+    <div class="loyalty-card">
+      <div class="loyalty-top">
+        <div>
+          <div class="loyalty-label">Member Tier</div>
+          <div id="tierName">Silver</div>
+        </div>
+        <div class="loyalty-orb"></div>
+      </div>
+
+      <div class="loyalty-stats">
+        <div id="pointsText">340 pts</div>
+        <div id="pointsNext">160 to Gold</div>
+      </div>
+
+      <div id="loyaltyBadges" class="loyalty-badges"></div>
+
+      <div class="loyalty-progress-shell">
+        <div id="loyaltyProgressFill" class="loyalty-progress-fill"></div>
+      </div>
+    </div>
+  </section>
+
   <div id="cartOverlay"></div>
+
   <aside id="cartDrawer">
     <button id="cartClose">Close</button>
     <div id="cartEmpty">Your cart is empty.</div>
     <div id="cartItems"></div>
+
     <div id="cartRecs">
       <div id="cartRecGrid"></div>
     </div>
+
     <div id="cartFooter">
       <div>Subtotal: <span id="cartSubtotal">$0.00</span></div>
       <div>Shipping: <span id="cartShipping">$0.00</span></div>
@@ -53,25 +90,19 @@
     </div>
   </aside>
 
-  <section>
-    <div id="tierName"></div>
-    <div id="pointsText"></div>
-    <div id="pointsNext"></div>
-    <div id="loyaltyBadges"></div>
-    <div style="width:100%;height:8px;background:#ddd;">
-      <div id="loyaltyProgressFill" style="height:8px;width:0;background:#999;"></div>
-    </div>
-  </section>
-
   <button id="aiChatBtn">AI Chat</button>
+
   <div id="aiChatPanel">
     <div id="aiMessages"></div>
-    <input id="aiInput" />
-    <button id="aiSend">Send</button>
+    <div style="display:flex; align-items:center;">
+      <input id="aiInput" />
+      <button id="aiSend">Send</button>
+    </div>
   </div>
 
   <button id="quizBtn">Quiz</button>
   <button id="openQuiz">Open Quiz</button>
+
   <div id="quizOverlay">
     <button id="closeQuiz">Close</button>
     <div id="step1" class="active"></div>
@@ -84,857 +115,857 @@
   <div id="cursor"></div>
   <div id="cursor-dot"></div>
 
-  <!-- paste your script block here -->
   <script>
-gsap.registerPlugin(ScrollTrigger);
+    gsap.registerPlugin(ScrollTrigger);
 
-const state = {
-  products: [],
-  filteredProducts: [],
-  categories: [],
-  socialProof: [],
-  cart: null,
-  recommendations: [],
-  loyalty: null,
-  currentFilter: "all",
-  currentSort: "featured",
-  aiOpen: false,
-  quizAnswers: {},
-  currentQuizStep: 1,
-  sessionId: localStorage.getItem("nexshop_session") || crypto.randomUUID()
-};
+    const state = {
+      products: [],
+      filteredProducts: [],
+      categories: [],
+      socialProof: [],
+      cart: null,
+      recommendations: [],
+      loyalty: null,
+      currentFilter: "all",
+      currentSort: "featured",
+      aiOpen: false,
+      quizAnswers: {},
+      currentQuizStep: 1,
+      sessionId: localStorage.getItem("nexshop_session") || crypto.randomUUID()
+    };
 
-localStorage.setItem("nexshop_session", state.sessionId);
+    localStorage.setItem("nexshop_session", state.sessionId);
 
-const els = {
-  nav: document.querySelector("nav"),
-  megaMenu: document.getElementById("megaMenu"),
-  megaProducts: document.getElementById("megaProducts"),
-  productsGrid: document.getElementById("productsGrid"),
-  sortSelect: document.getElementById("sortSelect"),
-  cartBtn: document.getElementById("cartBtn"),
-  cartOverlay: document.getElementById("cartOverlay"),
-  cartDrawer: document.getElementById("cartDrawer"),
-  cartCount: document.getElementById("cartCount"),
-  cartItems: document.getElementById("cartItems"),
-  cartEmpty: document.getElementById("cartEmpty"),
-  cartFooter: document.getElementById("cartFooter"),
-  cartSubtotal: document.getElementById("cartSubtotal"),
-  cartShipping: document.getElementById("cartShipping"),
-  cartTotal: document.getElementById("cartTotal"),
-  cartRecs: document.getElementById("cartRecs"),
-  cartRecGrid: document.getElementById("cartRecGrid"),
-  aiChatBtn: document.getElementById("aiChatBtn"),
-  aiChatPanel: document.getElementById("aiChatPanel"),
-  aiMessages: document.getElementById("aiMessages"),
-  aiInput: document.getElementById("aiInput"),
-  aiSend: document.getElementById("aiSend"),
-  quizOverlay: document.getElementById("quizOverlay"),
-  quizProgress: document.getElementById("quizProgress")
-};
+    const els = {
+      nav: document.querySelector("nav"),
+      megaMenu: document.getElementById("megaMenu"),
+      megaProducts: document.getElementById("megaProducts"),
+      productsGrid: document.getElementById("productsGrid"),
+      sortSelect: document.getElementById("sortSelect"),
+      cartBtn: document.getElementById("cartBtn"),
+      cartOverlay: document.getElementById("cartOverlay"),
+      cartDrawer: document.getElementById("cartDrawer"),
+      cartCount: document.getElementById("cartCount"),
+      cartItems: document.getElementById("cartItems"),
+      cartEmpty: document.getElementById("cartEmpty"),
+      cartFooter: document.getElementById("cartFooter"),
+      cartSubtotal: document.getElementById("cartSubtotal"),
+      cartShipping: document.getElementById("cartShipping"),
+      cartTotal: document.getElementById("cartTotal"),
+      cartRecs: document.getElementById("cartRecs"),
+      cartRecGrid: document.getElementById("cartRecGrid"),
+      aiChatBtn: document.getElementById("aiChatBtn"),
+      aiChatPanel: document.getElementById("aiChatPanel"),
+      aiMessages: document.getElementById("aiMessages"),
+      aiInput: document.getElementById("aiInput"),
+      aiSend: document.getElementById("aiSend"),
+      quizOverlay: document.getElementById("quizOverlay"),
+      quizProgress: document.getElementById("quizProgress")
+    };
 
-function escapeHtml(value) {
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
-}
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
 
-function currency(value) {
-  return `$${Number(value || 0).toFixed(2)}`;
-}
+    function currency(value) {
+      return `$${Number(value || 0).toFixed(2)}`;
+    }
 
-function debounce(fn, wait = 120) {
-  let timer;
-  return (...args) => {
-    clearTimeout(timer);
-    timer = setTimeout(() => fn(...args), wait);
-  };
-}
+    function debounce(fn, wait = 120) {
+      let timer;
+      return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn(...args), wait);
+      };
+    }
 
-async function fetchJson(url, options = {}) {
-  const response = await fetch(url, {
-    headers: {
-      "Content-Type": "application/json",
-      ...(options.headers || {})
-    },
-    ...options
-  });
+    async function fetchJson(url, options = {}) {
+      const response = await fetch(url, {
+        headers: {
+          "Content-Type": "application/json",
+          ...(options.headers || {})
+        },
+        ...options
+      });
 
-  const contentType = response.headers.get("content-type") || "";
-  const isJson = contentType.includes("application/json");
-  const payload = isJson ? await response.json() : await response.text();
+      const contentType = response.headers.get("content-type") || "";
+      const isJson = contentType.includes("application/json");
+      const payload = isJson ? await response.json() : await response.text();
 
-  if (!response.ok) {
-    const message =
-      typeof payload === "object" && payload
-        ? payload.error || payload.details || "Request failed"
-        : "Request failed";
-    throw new Error(message);
-  }
+      if (!response.ok) {
+        const message =
+          typeof payload === "object" && payload
+            ? payload.error || payload.details || "Request failed"
+            : "Request failed";
+        throw new Error(message);
+      }
 
-  return payload;
-}
+      return payload;
+    }
 
-function showToastMsg(message) {
-  const toast = document.createElement("div");
-  toast.className = "toast-msg";
-  toast.textContent = message;
-  document.body.appendChild(toast);
+    function showToastMsg(message) {
+      const toast = document.createElement("div");
+      toast.className = "toast-msg";
+      toast.textContent = message;
+      document.body.appendChild(toast);
 
-  requestAnimationFrame(() => {
-    toast.classList.add("show");
-  });
+      requestAnimationFrame(() => {
+        toast.classList.add("show");
+      });
 
-  setTimeout(() => {
-    toast.classList.remove("show");
-    setTimeout(() => toast.remove(), 300);
-  }, 2400);
-}
+      setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 300);
+      }, 2400);
+    }
 
-function getSelectedVariant(productId) {
-  const card = document.getElementById(`pc-${productId}`);
-  const selectedColor = card?.querySelector(".color-swatch.selected")?.dataset.color || "";
-  return {
-    color: selectedColor,
-    size: card?.dataset.defaultSize || ""
-  };
-}
+    function getSelectedVariant(productId) {
+      const card = document.getElementById(`pc-${productId}`);
+      const selectedColor = card?.querySelector(".color-swatch.selected")?.dataset.color || "";
+      return {
+        color: selectedColor,
+        size: card?.dataset.defaultSize || ""
+      };
+    }
 
-function setCardDefaultSize(product) {
-  const card = document.getElementById(`pc-${product.id}`);
-  if (!card) return;
-  card.dataset.defaultSize = product.sizes?.[0] || "";
-}
+    function setCardDefaultSize(product) {
+      const card = document.getElementById(`pc-${product.id}`);
+      if (!card) return;
+      card.dataset.defaultSize = product.sizes?.[0] || "";
+    }
 
-function discountPercent(product) {
-  if (!product.originalPrice || Number(product.originalPrice) <= Number(product.price)) {
-    return 0;
-  }
-  return Math.round((1 - Number(product.price) / Number(product.originalPrice)) * 100);
-}
+    function discountPercent(product) {
+      if (!product.originalPrice || Number(product.originalPrice) <= Number(product.price)) {
+        return 0;
+      }
+      return Math.round((1 - Number(product.price) / Number(product.originalPrice)) * 100);
+    }
 
-function stockLabel(product) {
-  if ((product.stock || 0) <= 0) return "Out of stock";
-  if ((product.stock || 0) < 10) return `Only ${product.stock} left`;
-  return "In Stock";
-}
+    function stockLabel(product) {
+      if ((product.stock || 0) <= 0) return "Out of stock";
+      if ((product.stock || 0) < 10) return `Only ${product.stock} left`;
+      return "In Stock";
+    }
 
-function stockClass(product) {
-  if ((product.stock || 0) < 10) return "low";
-  return "in-stock";
-}
+    function stockClass(product) {
+      if ((product.stock || 0) < 10) return "low";
+      return "in-stock";
+    }
 
-function ratingStars(rating) {
-  const rounded = Math.max(1, Math.round(Number(rating || 0)));
-  return "★".repeat(rounded);
-}
+    function ratingStars(rating) {
+      const rounded = Math.max(1, Math.round(Number(rating || 0)));
+      return "★".repeat(rounded);
+    }
 
-async function loadProducts() {
-  const params = new URLSearchParams({
-    page: "1",
-    pageSize: "24",
-    sort: state.currentSort
-  });
+    async function loadProducts() {
+      const params = new URLSearchParams({
+        page: "1",
+        pageSize: "24",
+        sort: state.currentSort
+      });
 
-  if (state.currentFilter !== "all") {
-    params.set("category", state.currentFilter);
-  }
+      if (state.currentFilter !== "all") {
+        params.set("category", state.currentFilter);
+      }
 
-  const data = await fetchJson(`/api/products?${params.toString()}`);
-  state.products = data.products || [];
-  state.filteredProducts = [...state.products];
-  renderProducts();
-}
+      const data = await fetchJson(`/api/products?${params.toString()}`);
+      state.products = data.products || [];
+      state.filteredProducts = [...state.products];
+      renderProducts();
+      renderMegaMenu();
+    }
 
-async function loadCategories() {
-  try {
-    const categories = await fetchJson("/api/products/categories");
-    state.categories = Array.isArray(categories) ? categories : [];
-    renderMegaMenu();
-  } catch {
-    state.categories = [];
-  }
-}
+    async function loadCategories() {
+      try {
+        const categories = await fetchJson("/api/products/categories");
+        state.categories = Array.isArray(categories) ? categories : [];
+        renderMegaMenu();
+      } catch {
+        state.categories = [];
+      }
+    }
 
-async function loadSocialProof() {
-  try {
-    const data = await fetchJson("/api/products/social-proof");
-    state.socialProof = Array.isArray(data) ? data : [];
-    renderTicker();
-  } catch {
-    state.socialProof = [];
-  }
-}
+    async function loadSocialProof() {
+      try {
+        const data = await fetchJson("/api/products/social-proof");
+        state.socialProof = Array.isArray(data) ? data : [];
+        renderTicker();
+      } catch {
+        state.socialProof = [];
+      }
+    }
 
-async function loadLoyalty() {
-  try {
-    state.loyalty = await fetchJson("/api/ai/loyalty");
-    renderLoyalty();
-  } catch {
-    state.loyalty = null;
-  }
-}
+    async function loadLoyalty() {
+      try {
+        state.loyalty = await fetchJson("/api/ai/loyalty");
+        renderLoyalty();
+      } catch {
+        state.loyalty = null;
+      }
+    }
 
-async function loadCart() {
-  state.cart = await fetchJson(`/api/cart/${state.sessionId}`);
-  renderCartCount();
-  renderCartBody();
-}
+    async function loadCart() {
+      state.cart = await fetchJson(`/api/cart/${state.sessionId}`);
+      renderCartCount();
+      renderCartBody();
+    }
 
-async function loadCartRecommendations() {
-  try {
-    state.recommendations = await fetchJson(`/api/cart/${state.sessionId}/recommendations`);
-  } catch {
-    state.recommendations = [];
-  }
-  renderCartRecommendations();
-}
+    async function loadCartRecommendations() {
+      try {
+        state.recommendations = await fetchJson(`/api/cart/${state.sessionId}/recommendations`);
+      } catch {
+        state.recommendations = [];
+      }
+      renderCartRecommendations();
+    }
 
-function renderTicker() {
-  const tickerTrack = document.getElementById("tickerTrack");
-  if (!tickerTrack || !state.socialProof.length) return;
+    function renderTicker() {
+      const tickerTrack = document.getElementById("tickerTrack");
+      if (!tickerTrack || !state.socialProof.length) return;
 
-  const items = [...state.socialProof, ...state.socialProof]
-    .map(item => `
-      <div class="ticker-item">
-        <span>${escapeHtml(item.userName)} in ${escapeHtml(item.userLocation)} ${escapeHtml(item.action)} ${escapeHtml(item.productName)}</span>
-        <span class="ticker-dot"></span>
-      </div>
-    `)
-    .join("");
+      const items = [...state.socialProof, ...state.socialProof]
+        .map(item => `
+          <div class="ticker-item">
+            <span>${escapeHtml(item.userName)} in ${escapeHtml(item.userLocation)} ${escapeHtml(item.action)} ${escapeHtml(item.productName)}</span>
+            <span class="ticker-dot"></span>
+          </div>
+        `)
+        .join("");
 
-  tickerTrack.innerHTML = items;
-}
+      tickerTrack.innerHTML = items;
+    }
 
-function renderMegaMenu() {
-  if (!els.megaProducts) return;
+    function renderMegaMenu() {
+      if (!els.megaProducts || !state.products.length) return;
 
-  const featured = state.products.slice(0, 4);
-  els.megaProducts.innerHTML = featured.map(product => `
-    <div class="mega-product-card" data-action="product-card" data-id="${product.id}">
-      <img src="${product.imageUrl}" alt="${escapeHtml(product.name)}">
-      <div class="mega-product-info">
-        <div class="name">${escapeHtml(product.name)}</div>
-        <div class="price">${currency(product.price)}</div>
-      </div>
-    </div>
-  `).join("");
-}
-
-function renderLoyalty() {
-  if (!state.loyalty) return;
-
-  const tierName = document.getElementById("tierName");
-  const pointsText = document.getElementById("pointsText");
-  const pointsNext = document.getElementById("pointsNext");
-  const progressFill = document.getElementById("loyaltyProgressFill");
-  const badgesWrap = document.getElementById("loyaltyBadges");
-
-  if (tierName) tierName.textContent = state.loyalty.tier || "Silver";
-  if (pointsText) pointsText.textContent = `${state.loyalty.points || 0} pts`;
-  if (pointsNext) {
-    pointsNext.textContent = `${state.loyalty.pointsToNextTier || 0} to ${state.loyalty.nextTier || "Gold"}`;
-  }
-
-  const pct = Math.max(
-    0,
-    Math.min(100, Math.round(((state.loyalty.points || 0) / ((state.loyalty.points || 0) + (state.loyalty.pointsToNextTier || 1))) * 100))
-  );
-
-  if (progressFill) {
-    progressFill.style.width = `${pct}%`;
-  }
-
-  if (badgesWrap) {
-    badgesWrap.innerHTML = (state.loyalty.badges || [])
-      .map(badge => `<span class="loyalty-badge">${escapeHtml(badge)}</span>`)
-      .join("");
-  }
-}
-
-function renderProducts() {
-  if (!els.productsGrid) return;
-
-  if (!state.filteredProducts.length) {
-    els.productsGrid.innerHTML = `
-      <div class="empty-state">
-        <h3>No products found</h3>
-        <p>Try a different category or sort option.</p>
-      </div>
-    `;
-    return;
-  }
-
-  els.productsGrid.innerHTML = state.filteredProducts.map(product => {
-    const discount = discountPercent(product);
-
-    return `
-      <article
-        class="product-card"
-        id="pc-${product.id}"
-        data-id="${product.id}"
-      >
-        <div class="product-img-wrap">
+      const featured = state.products.slice(0, 4);
+      els.megaProducts.innerHTML = featured.map(product => `
+        <div class="mega-product-card" data-action="product-card" data-id="${product.id}">
           <img src="${product.imageUrl}" alt="${escapeHtml(product.name)}">
-          <div class="product-badges">
-            ${product.isNew ? `<span class="badge badge-new">New</span>` : ""}
-            ${product.isTrending ? `<span class="badge badge-trending">Trending</span>` : ""}
-            ${discount > 0 ? `<span class="badge badge-sale">-${discount}%</span>` : ""}
-          </div>
-
-          <div class="product-actions">
-            <button class="btn-add-cart" data-action="add-to-cart" data-id="${product.id}">
-              Add to Cart
-            </button>
-            <button class="btn-wishlist" data-action="wishlist" data-id="${product.id}" aria-label="Add to wishlist">
-              ♡
-            </button>
+          <div class="mega-product-info">
+            <div class="name">${escapeHtml(product.name)}</div>
+            <div class="price">${currency(product.price)}</div>
           </div>
         </div>
+      `).join("");
+    }
 
-        <div class="product-info">
-          <div class="product-brand">${escapeHtml(product.brand)}</div>
-          <div class="product-name">${escapeHtml(product.name)}</div>
+    function renderLoyalty() {
+      if (!state.loyalty) return;
 
-          <div class="product-rating">
-            <span class="stars">${ratingStars(product.rating)}</span>
-            <span class="rating-count">(${product.reviewCount || 0})</span>
+      const tierName = document.getElementById("tierName");
+      const pointsText = document.getElementById("pointsText");
+      const pointsNext = document.getElementById("pointsNext");
+      const progressFill = document.getElementById("loyaltyProgressFill");
+      const badgesWrap = document.getElementById("loyaltyBadges");
+
+      if (tierName) tierName.textContent = state.loyalty.tier || "Silver";
+      if (pointsText) pointsText.textContent = `${state.loyalty.points || 0} pts`;
+      if (pointsNext) {
+        pointsNext.textContent = `${state.loyalty.pointsToNextTier || 0} to ${state.loyalty.nextTier || "Gold"}`;
+      }
+
+      const pct = Math.max(
+        0,
+        Math.min(
+          100,
+          Math.round(
+            ((state.loyalty.points || 0) /
+              ((state.loyalty.points || 0) + (state.loyalty.pointsToNextTier || 1))) * 100
+          )
+        )
+      );
+
+      if (progressFill) {
+        progressFill.style.width = `${pct}%`;
+      }
+
+      if (badgesWrap) {
+        badgesWrap.innerHTML = (state.loyalty.badges || [])
+          .map(badge => `<span class="loyalty-badge">${escapeHtml(badge)}</span>`)
+          .join("");
+      }
+    }
+
+    function renderProducts() {
+      if (!els.productsGrid) return;
+
+      if (!state.filteredProducts.length) {
+        els.productsGrid.innerHTML = `
+          <div class="empty-state">
+            <h3>No products found</h3>
+            <p>Try a different category or sort option.</p>
           </div>
+        `;
+        return;
+      }
 
-          <div class="product-price-row">
-            <div>
-              <span class="product-price">${currency(product.price)}</span>
-              ${product.originalPrice ? `<span class="product-original">${currency(product.originalPrice)}</span>` : ""}
+      els.productsGrid.innerHTML = state.filteredProducts.map(product => {
+        const discount = discountPercent(product);
+
+        return `
+          <article class="product-card" id="pc-${product.id}" data-id="${product.id}">
+            <div class="product-img-wrap">
+              <img src="${product.imageUrl}" alt="${escapeHtml(product.name)}">
+              <div class="product-badges">
+                ${product.isNew ? `<span class="badge badge-new">New</span>` : ""}
+                ${product.isTrending ? `<span class="badge badge-trending">Trending</span>` : ""}
+                ${discount > 0 ? `<span class="badge badge-sale">-${discount}%</span>` : ""}
+              </div>
+
+              <div class="product-actions">
+                <button class="btn-add-cart" data-action="add-to-cart" data-id="${product.id}">
+                  Add to Cart
+                </button>
+                <button class="btn-wishlist" data-action="wishlist" data-id="${product.id}" aria-label="Add to wishlist">
+                  ♡
+                </button>
+              </div>
             </div>
-            ${discount > 0 ? `<span class="product-discount">Save ${discount}%</span>` : ""}
-          </div>
 
-          <div class="stock-indicator">
-            <div class="stock-dot ${stockClass(product)}"></div>
-            <span class="stock-text">${stockLabel(product)}</span>
-          </div>
+            <div class="product-info">
+              <div class="product-brand">${escapeHtml(product.brand)}</div>
+              <div class="product-name">${escapeHtml(product.name)}</div>
 
-          <div class="color-swatches">
-            ${(product.colors || []).map((color, index) => `
+              <div class="product-rating">
+                <span class="stars">${ratingStars(product.rating)}</span>
+                <span class="rating-count">(${product.reviewCount || 0})</span>
+              </div>
+
+              <div class="product-price-row">
+                <div>
+                  <span class="product-price">${currency(product.price)}</span>
+                  ${product.originalPrice ? `<span class="product-original">${currency(product.originalPrice)}</span>` : ""}
+                </div>
+                ${discount > 0 ? `<span class="product-discount">Save ${discount}%</span>` : ""}
+              </div>
+
+              <div class="stock-indicator">
+                <div class="stock-dot ${stockClass(product)}"></div>
+                <span class="stock-text">${stockLabel(product)}</span>
+              </div>
+
+              <div class="color-swatches">
+                ${(product.colors || []).map((color, index) => `
+                  <button
+                    class="color-swatch ${index === 0 ? "selected" : ""}"
+                    style="background:${color}"
+                    data-action="select-color"
+                    data-id="${product.id}"
+                    data-color="${escapeHtml(color)}"
+                    aria-label="Choose color"
+                  ></button>
+                `).join("")}
+              </div>
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      state.filteredProducts.forEach(setCardDefaultSize);
+
+      gsap.fromTo(
+        ".product-card",
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 0.5, stagger: 0.06, ease: "power2.out" }
+      );
+    }
+
+    function renderCartCount() {
+      const total = state.cart?.itemCount || 0;
+      if (els.cartCount) {
+        els.cartCount.textContent = total;
+        els.cartCount.style.display = total > 0 ? "flex" : "none";
+      }
+    }
+
+    function openCart() {
+      els.cartOverlay?.classList.add("open");
+      els.cartDrawer?.classList.add("open");
+      loadCartRecommendations();
+    }
+
+    function closeCart() {
+      els.cartOverlay?.classList.remove("open");
+      els.cartDrawer?.classList.remove("open");
+    }
+
+    function renderCartBody() {
+      if (!state.cart) return;
+
+      const items = state.cart.items || [];
+
+      if (!items.length) {
+        if (els.cartEmpty) els.cartEmpty.style.display = "flex";
+        if (els.cartItems) els.cartItems.innerHTML = "";
+        if (els.cartFooter) els.cartFooter.style.display = "none";
+        if (els.cartRecs) els.cartRecs.style.display = "none";
+        return;
+      }
+
+      if (els.cartEmpty) els.cartEmpty.style.display = "none";
+      if (els.cartFooter) els.cartFooter.style.display = "block";
+      if (els.cartRecs) els.cartRecs.style.display = "block";
+
+      if (els.cartItems) {
+        els.cartItems.innerHTML = items.map(item => `
+          <div class="cart-item">
+            <div class="cart-item-img">
+              <img src="${item.product?.imageUrl || ""}" alt="${escapeHtml(item.product?.name || "Product")}">
+            </div>
+
+            <div class="cart-item-info">
+              <div class="cart-item-brand">${escapeHtml(item.product?.brand || "")}</div>
+              <div class="cart-item-name">${escapeHtml(item.product?.name || "")}</div>
+              <div class="cart-item-meta">
+                ${escapeHtml(item.selectedColor || "")} · ${escapeHtml(item.selectedSize || "")}
+              </div>
+
+              <div class="cart-qty-row">
+                <div class="qty-controls">
+                  <button
+                    class="qty-btn"
+                    data-action="decrease-cart-item"
+                    data-id="${item.productId}"
+                    data-color="${escapeHtml(item.selectedColor || "")}"
+                    data-size="${escapeHtml(item.selectedSize || "")}"
+                  >−</button>
+
+                  <span class="qty-num">${item.quantity}</span>
+
+                  <button
+                    class="qty-btn"
+                    data-action="increase-cart-item"
+                    data-id="${item.productId}"
+                    data-color="${escapeHtml(item.selectedColor || "")}"
+                    data-size="${escapeHtml(item.selectedSize || "")}"
+                  >+</button>
+                </div>
+
+                <div class="cart-item-price">${currency(item.product?.price || 0)}</div>
+              </div>
+
               <button
-                class="color-swatch ${index === 0 ? "selected" : ""}"
-                style="background:${color}"
-                data-action="select-color"
-                data-id="${product.id}"
-                data-color="${escapeHtml(color)}"
-                aria-label="Choose color"
-              ></button>
-            `).join("")}
-          </div>
-        </div>
-      </article>
-    `;
-  }).join("");
-
-  state.filteredProducts.forEach(setCardDefaultSize);
-
-  gsap.fromTo(
-    ".product-card",
-    { opacity: 0, y: 30 },
-    { opacity: 1, y: 0, duration: 0.5, stagger: 0.06, ease: "power2.out" }
-  );
-}
-
-function renderCartCount() {
-  const total = state.cart?.itemCount || 0;
-  if (els.cartCount) {
-    els.cartCount.textContent = total;
-    els.cartCount.style.display = total > 0 ? "flex" : "none";
-  }
-}
-
-function openCart() {
-  els.cartOverlay?.classList.add("open");
-  els.cartDrawer?.classList.add("open");
-  loadCartRecommendations();
-}
-
-function closeCart() {
-  els.cartOverlay?.classList.remove("open");
-  els.cartDrawer?.classList.remove("open");
-}
-
-function renderCartBody() {
-  if (!state.cart) return;
-
-  const items = state.cart.items || [];
-
-  if (!items.length) {
-    if (els.cartEmpty) els.cartEmpty.style.display = "flex";
-    if (els.cartItems) els.cartItems.innerHTML = "";
-    if (els.cartFooter) els.cartFooter.style.display = "none";
-    if (els.cartRecs) els.cartRecs.style.display = "none";
-    return;
-  }
-
-  if (els.cartEmpty) els.cartEmpty.style.display = "none";
-  if (els.cartFooter) els.cartFooter.style.display = "block";
-  if (els.cartRecs) els.cartRecs.style.display = "block";
-
-  if (els.cartItems) {
-    els.cartItems.innerHTML = items.map(item => `
-      <div class="cart-item">
-        <div class="cart-item-img">
-          <img src="${item.product?.imageUrl || ""}" alt="${escapeHtml(item.product?.name || "Product")}">
-        </div>
-
-        <div class="cart-item-info">
-          <div class="cart-item-brand">${escapeHtml(item.product?.brand || "")}</div>
-          <div class="cart-item-name">${escapeHtml(item.product?.name || "")}</div>
-          <div class="cart-item-meta">
-            ${escapeHtml(item.selectedColor || "")} · ${escapeHtml(item.selectedSize || "")}
-          </div>
-
-          <div class="cart-qty-row">
-            <div class="qty-controls">
-              <button
-                class="qty-btn"
-                data-action="decrease-cart-item"
+                class="cart-remove-btn"
+                data-action="remove-cart-item"
                 data-id="${item.productId}"
                 data-color="${escapeHtml(item.selectedColor || "")}"
                 data-size="${escapeHtml(item.selectedSize || "")}"
-              >−</button>
-
-              <span class="qty-num">${item.quantity}</span>
-
-              <button
-                class="qty-btn"
-                data-action="increase-cart-item"
-                data-id="${item.productId}"
-                data-color="${escapeHtml(item.selectedColor || "")}"
-                data-size="${escapeHtml(item.selectedSize || "")}"
-              >+</button>
+              >
+                Remove
+              </button>
             </div>
-
-            <div class="cart-item-price">${currency(item.product?.price || 0)}</div>
           </div>
+        `).join("");
+      }
 
-          <button
-            class="cart-remove-btn"
-            data-action="remove-cart-item"
-            data-id="${item.productId}"
-            data-color="${escapeHtml(item.selectedColor || "")}"
-            data-size="${escapeHtml(item.selectedSize || "")}"
-          >
-            Remove
-          </button>
+      if (els.cartSubtotal) els.cartSubtotal.textContent = currency(state.cart.subtotal);
+      if (els.cartShipping) els.cartShipping.textContent = currency(state.cart.shipping);
+      if (els.cartTotal) els.cartTotal.textContent = currency(state.cart.total);
+    }
+
+    function renderCartRecommendations() {
+      if (!els.cartRecGrid) return;
+
+      if (!state.recommendations.length) {
+        els.cartRecGrid.innerHTML = "";
+        return;
+      }
+
+      els.cartRecGrid.innerHTML = state.recommendations.map(product => `
+        <div class="cart-rec-item" data-action="add-to-cart" data-id="${product.id}">
+          <img src="${product.imageUrl}" alt="${escapeHtml(product.name)}">
+          <div class="cart-rec-info">
+            <div class="n">${escapeHtml(product.name)}</div>
+            <div class="p">${currency(product.price)}</div>
+          </div>
         </div>
-      </div>
-    `).join("");
-  }
-
-  if (els.cartSubtotal) els.cartSubtotal.textContent = currency(state.cart.subtotal);
-  if (els.cartShipping) els.cartShipping.textContent = currency(state.cart.shipping);
-  if (els.cartTotal) els.cartTotal.textContent = currency(state.cart.total);
-}
-
-function renderCartRecommendations() {
-  if (!els.cartRecGrid) return;
-
-  if (!state.recommendations.length) {
-    els.cartRecGrid.innerHTML = "";
-    return;
-  }
-
-  els.cartRecGrid.innerHTML = state.recommendations.map(product => `
-    <div class="cart-rec-item" data-action="add-to-cart" data-id="${product.id}">
-      <img src="${product.imageUrl}" alt="${escapeHtml(product.name)}">
-      <div class="cart-rec-info">
-        <div class="n">${escapeHtml(product.name)}</div>
-        <div class="p">${currency(product.price)}</div>
-      </div>
-    </div>
-  `).join("");
-}
-
-async function addToCart(productId) {
-  const product = state.products.find(x => x.id === Number(productId));
-  if (!product) return;
-
-  const variant = getSelectedVariant(product.id);
-  const color = variant.color || product.colors?.[0] || "";
-  const size = variant.size || product.sizes?.[0] || "";
-
-  state.cart = await fetchJson(`/api/cart/${state.sessionId}/add`, {
-    method: "POST",
-    body: JSON.stringify({
-      productId: product.id,
-      quantity: 1,
-      color,
-      size
-    })
-  });
-
-  renderCartCount();
-  renderCartBody();
-  openCart();
-
-  if (els.cartBtn) {
-    gsap.fromTo(
-      els.cartBtn,
-      { scale: 1.18 },
-      { scale: 1, duration: 0.4, ease: "elastic.out(1,0.5)" }
-    );
-  }
-}
-
-async function updateCartQuantity(productId, color, size, quantity) {
-  state.cart = await fetchJson(
-    `/api/cart/${state.sessionId}/update/${productId}?color=${encodeURIComponent(color)}&size=${encodeURIComponent(size)}`,
-    {
-      method: "PUT",
-      body: JSON.stringify({ quantity })
+      `).join("");
     }
-  );
 
-  renderCartCount();
-  renderCartBody();
-}
+    async function addToCart(productId) {
+      const product = state.products.find(x => x.id === Number(productId));
+      if (!product) return;
 
-async function removeCartItem(productId, color, size) {
-  state.cart = await fetchJson(
-    `/api/cart/${state.sessionId}/remove/${productId}?color=${encodeURIComponent(color)}&size=${encodeURIComponent(size)}`,
-    {
-      method: "DELETE"
+      const variant = getSelectedVariant(product.id);
+      const color = variant.color || product.colors?.[0] || "";
+      const size = variant.size || product.sizes?.[0] || "";
+
+      state.cart = await fetchJson(`/api/cart/${state.sessionId}/add`, {
+        method: "POST",
+        body: JSON.stringify({
+          productId: product.id,
+          quantity: 1,
+          color,
+          size
+        })
+      });
+
+      renderCartCount();
+      renderCartBody();
+      openCart();
+
+      if (els.cartBtn) {
+        gsap.fromTo(
+          els.cartBtn,
+          { scale: 1.18 },
+          { scale: 1, duration: 0.4, ease: "elastic.out(1,0.5)" }
+        );
+      }
     }
-  );
 
-  renderCartCount();
-  renderCartBody();
-}
+    async function updateCartQuantity(productId, color, size, quantity) {
+      state.cart = await fetchJson(
+        `/api/cart/${state.sessionId}/update/${productId}?color=${encodeURIComponent(color)}&size=${encodeURIComponent(size)}`,
+        {
+          method: "PUT",
+          body: JSON.stringify({ quantity })
+        }
+      );
 
-function selectColor(button, productId, color) {
-  const card = document.getElementById(`pc-${productId}`);
-  if (!card) return;
+      renderCartCount();
+      renderCartBody();
+    }
 
-  card.querySelectorAll(".color-swatch").forEach(swatch => {
-    swatch.classList.remove("selected");
-  });
+    async function removeCartItem(productId, color, size) {
+      state.cart = await fetchJson(
+        `/api/cart/${state.sessionId}/remove/${productId}?color=${encodeURIComponent(color)}&size=${encodeURIComponent(size)}`,
+        {
+          method: "DELETE"
+        }
+      );
 
-  button.classList.add("selected");
-  card.dataset.selectedColor = color;
-}
+      renderCartCount();
+      renderCartBody();
+    }
 
-function tiltCard(event, card) {
-  const rect = card.getBoundingClientRect();
-  const x = (event.clientX - rect.left) / rect.width - 0.5;
-  const y = (event.clientY - rect.top) / rect.height - 0.5;
+    function selectColor(button, productId, color) {
+      const card = document.getElementById(`pc-${productId}`);
+      if (!card) return;
 
-  card.style.transform = `perspective(800px) rotateY(${x * 12}deg) rotateX(${-y * 12}deg) translateZ(6px)`;
-}
+      card.querySelectorAll(".color-swatch").forEach(swatch => {
+        swatch.classList.remove("selected");
+      });
 
-function resetTilt(card) {
-  gsap.to(card, {
-    rotateX: 0,
-    rotateY: 0,
-    z: 0,
-    duration: 0.6,
-    ease: "elastic.out(1,0.5)",
-    clearProps: "transform"
-  });
-}
+      button.classList.add("selected");
+      card.dataset.selectedColor = color;
+    }
 
-function appendMsg(text, role) {
-  if (!els.aiMessages) return;
-  const div = document.createElement("div");
-  div.className = `ai-msg ${role}`;
-  div.textContent = text;
-  els.aiMessages.appendChild(div);
-  els.aiMessages.scrollTop = els.aiMessages.scrollHeight;
-}
+    function tiltCard(event, card) {
+      const rect = card.getBoundingClientRect();
+      const x = (event.clientX - rect.left) / rect.width - 0.5;
+      const y = (event.clientY - rect.top) / rect.height - 0.5;
 
-function appendProductSuggestions(products) {
-  if (!els.aiMessages || !Array.isArray(products) || !products.length) return;
+      card.style.transform = `perspective(800px) rotateY(${x * 12}deg) rotateX(${-y * 12}deg) translateZ(6px)`;
+    }
 
-  const wrap = document.createElement("div");
-  wrap.className = "ai-msg-products";
-  wrap.innerHTML = products.map(product => `
-    <div class="ai-product-mini" data-action="add-to-cart" data-id="${product.id}">
-      <img src="${product.imageUrl}" alt="${escapeHtml(product.name)}">
-      <div class="mini-info">
-        <div class="mini-name">${escapeHtml(product.name)}</div>
-        <div class="mini-price">${currency(product.price)}</div>
-      </div>
-    </div>
-  `).join("");
+    function resetTilt(card) {
+      gsap.to(card, {
+        rotateX: 0,
+        rotateY: 0,
+        z: 0,
+        duration: 0.6,
+        ease: "elastic.out(1,0.5)",
+        clearProps: "transform"
+      });
+    }
 
-  els.aiMessages.appendChild(wrap);
-  els.aiMessages.scrollTop = els.aiMessages.scrollHeight;
-}
+    function appendMsg(text, role) {
+      if (!els.aiMessages) return;
+      const div = document.createElement("div");
+      div.className = `ai-msg ${role}`;
+      div.textContent = text;
+      els.aiMessages.appendChild(div);
+      els.aiMessages.scrollTop = els.aiMessages.scrollHeight;
+    }
 
-function showTyping() {
-  if (!els.aiMessages) return null;
+    function appendProductSuggestions(products) {
+      if (!els.aiMessages || !Array.isArray(products) || !products.length) return;
 
-  const typing = document.createElement("div");
-  typing.className = "ai-typing";
-  typing.innerHTML = "<span></span><span></span><span></span>";
-  els.aiMessages.appendChild(typing);
-  els.aiMessages.scrollTop = els.aiMessages.scrollHeight;
-  return typing;
-}
+      const wrap = document.createElement("div");
+      wrap.className = "ai-msg-products";
+      wrap.innerHTML = products.map(product => `
+        <div class="ai-product-mini" data-action="add-to-cart" data-id="${product.id}">
+          <img src="${product.imageUrl}" alt="${escapeHtml(product.name)}">
+          <div class="mini-info">
+            <div class="mini-name">${escapeHtml(product.name)}</div>
+            <div class="mini-price">${currency(product.price)}</div>
+          </div>
+        </div>
+      `).join("");
 
-async function sendAiMessage() {
-  const text = els.aiInput?.value?.trim();
-  if (!text) return;
+      els.aiMessages.appendChild(wrap);
+      els.aiMessages.scrollTop = els.aiMessages.scrollHeight;
+    }
 
-  appendMsg(text, "user");
-  els.aiInput.value = "";
+    function showTyping() {
+      if (!els.aiMessages) return null;
 
-  const typing = showTyping();
+      const typing = document.createElement("div");
+      typing.className = "ai-typing";
+      typing.innerHTML = "<span></span><span></span><span></span>";
+      els.aiMessages.appendChild(typing);
+      els.aiMessages.scrollTop = els.aiMessages.scrollHeight;
+      return typing;
+    }
 
-  try {
-    const response = await fetchJson("/api/ai/chat", {
-      method: "POST",
-      body: JSON.stringify({
-        message: text,
-        conversationHistory: []
-      })
+    async function sendAiMessage() {
+      const text = els.aiInput?.value?.trim();
+      if (!text) return;
+
+      appendMsg(text, "user");
+      els.aiInput.value = "";
+
+      const typing = showTyping();
+
+      try {
+        const response = await fetchJson("/api/ai/chat", {
+          method: "POST",
+          body: JSON.stringify({
+            message: text,
+            conversationHistory: []
+          })
+        });
+
+        typing?.remove();
+        appendMsg(response.reply || "I found a few great options for you.", "assistant");
+
+        if (response.products?.length) {
+          appendProductSuggestions(response.products);
+        }
+      } catch {
+        typing?.remove();
+        appendMsg("I’m having trouble right now, but I can still help you browse the catalog.", "assistant");
+      }
+    }
+
+    function openAiChat() {
+      state.aiOpen = true;
+      els.aiChatPanel?.classList.add("open");
+    }
+
+    function closeAiChat() {
+      state.aiOpen = false;
+      els.aiChatPanel?.classList.remove("open");
+    }
+
+    function toggleAiChat() {
+      if (state.aiOpen) closeAiChat();
+      else openAiChat();
+    }
+
+    function openQuiz() {
+      els.quizOverlay?.classList.add("open");
+    }
+
+    function closeQuiz() {
+      els.quizOverlay?.classList.remove("open");
+    }
+
+    function nextStep(next, answer) {
+      state.quizAnswers[`step${state.currentQuizStep}`] = answer;
+
+      const current = document.getElementById(`step${state.currentQuizStep}`);
+      const target = document.getElementById(`step${next}`);
+
+      current?.classList.remove("active");
+      target?.classList.add("active");
+
+      state.currentQuizStep = next;
+
+      if (els.quizProgress) {
+        els.quizProgress.style.width = `${(next / 4) * 100}%`;
+      }
+    }
+
+    function finishQuiz(answer) {
+      state.quizAnswers.step4 = answer;
+      closeQuiz();
+      showToastMsg("✦ Style profile saved! Curating your personalized store now…");
+      setTimeout(() => {
+        state.currentFilter = "all";
+        loadProducts();
+      }, 800);
+    }
+
+    function bindStaticEvents() {
+      window.addEventListener("scroll", () => {
+        if (!els.nav) return;
+        els.nav.classList.toggle("scrolled", window.scrollY > 24);
+      });
+
+      els.cartBtn?.addEventListener("click", openCart);
+      els.cartOverlay?.addEventListener("click", closeCart);
+
+      document.getElementById("cartClose")?.addEventListener("click", closeCart);
+      document.getElementById("quizBtn")?.addEventListener("click", openQuiz);
+      document.getElementById("openQuiz")?.addEventListener("click", openQuiz);
+      document.getElementById("closeQuiz")?.addEventListener("click", closeQuiz);
+
+      els.aiChatBtn?.addEventListener("click", toggleAiChat);
+      els.aiSend?.addEventListener("click", sendAiMessage);
+      els.aiInput?.addEventListener("keydown", event => {
+        if (event.key === "Enter") sendAiMessage();
+      });
+
+      document.querySelectorAll(".filter-chip").forEach(chip => {
+        chip.addEventListener("click", async () => {
+          document.querySelectorAll(".filter-chip").forEach(c => c.classList.remove("active"));
+          chip.classList.add("active");
+          state.currentFilter = chip.dataset.filter || "all";
+          await loadProducts();
+        });
+      });
+
+      els.sortSelect?.addEventListener("change", async event => {
+        state.currentSort = event.target.value || "featured";
+        await loadProducts();
+      });
+
+      document.addEventListener("mousemove", debounce(event => {
+        const cursor = document.getElementById("cursor");
+        const dot = document.getElementById("cursor-dot");
+        if (cursor) {
+          cursor.style.left = `${event.clientX}px`;
+          cursor.style.top = `${event.clientY}px`;
+        }
+        if (dot) {
+          dot.style.left = `${event.clientX}px`;
+          dot.style.top = `${event.clientY}px`;
+        }
+      }, 8));
+
+      document.addEventListener("mouseover", event => {
+        const target = event.target.closest("a, button, .product-card, .cart-rec-item, .ai-product-mini, .mega-product-card");
+        document.body.classList.toggle("hovering", !!target);
+      });
+
+      document.addEventListener("mousedown", () => {
+        document.body.classList.add("clicking");
+      });
+
+      document.addEventListener("mouseup", () => {
+        document.body.classList.remove("clicking");
+      });
+
+      document.addEventListener("click", async event => {
+        const button = event.target.closest("[data-action]");
+        if (!button) return;
+
+        const action = button.dataset.action;
+        const id = Number(button.dataset.id || 0);
+        const color = button.dataset.color || "";
+        const size = button.dataset.size || "";
+
+        try {
+          if (action === "add-to-cart") {
+            await addToCart(id);
+            return;
+          }
+
+          if (action === "increase-cart-item") {
+            const item = state.cart?.items?.find(x =>
+              x.productId === id &&
+              x.selectedColor === color &&
+              x.selectedSize === size
+            );
+            if (item) {
+              await updateCartQuantity(id, color, size, item.quantity + 1);
+            }
+            return;
+          }
+
+          if (action === "decrease-cart-item") {
+            const item = state.cart?.items?.find(x =>
+              x.productId === id &&
+              x.selectedColor === color &&
+              x.selectedSize === size
+            );
+            if (item) {
+              await updateCartQuantity(id, color, size, Math.max(0, item.quantity - 1));
+            }
+            return;
+          }
+
+          if (action === "remove-cart-item") {
+            await removeCartItem(id, color, size);
+            return;
+          }
+
+          if (action === "select-color") {
+            selectColor(button, id, color);
+            return;
+          }
+
+          if (action === "wishlist") {
+            button.classList.toggle("active");
+            showToastMsg("Saved to wishlist");
+            return;
+          }
+        } catch (error) {
+          console.error(error);
+          showToastMsg(error.message || "Something went wrong.");
+        }
+      });
+
+      document.addEventListener("mousemove", event => {
+        const card = event.target.closest(".product-card");
+        if (card) tiltCard(event, card);
+      });
+
+      document.addEventListener("mouseleave", event => {
+        const card = event.target.closest?.(".product-card");
+        if (card) resetTilt(card);
+      }, true);
+    }
+
+    function initAnimations() {
+      gsap.fromTo(".hero-kicker", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.65, delay: 0.1 });
+      gsap.fromTo(".hero-title", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.85, delay: 0.18 });
+      gsap.fromTo(".hero-subtitle", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.75, delay: 0.28 });
+
+      ScrollTrigger.batch(".section, .loyalty-wrap", {
+        onEnter: batch => gsap.to(batch, {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          stagger: 0.12,
+          ease: "power2.out"
+        }),
+        start: "top 88%"
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      bindStaticEvents();
+      initAnimations();
+
+      try {
+        await Promise.all([
+          loadProducts(),
+          loadCategories(),
+          loadSocialProof(),
+          loadLoyalty(),
+          loadCart()
+        ]);
+      } catch (error) {
+        console.error(error);
+        showToastMsg("Initial load failed. Check your API routes.");
+      }
     });
 
-    typing?.remove();
-    appendMsg(response.reply || "I found a few great options for you.", "assistant");
-
-    if (response.products?.length) {
-      appendProductSuggestions(response.products);
-    }
-  } catch {
-    typing?.remove();
-    appendMsg("I’m having trouble right now, but I can still help you browse the catalog.", "assistant");
-  }
-}
-
-function openAiChat() {
-  state.aiOpen = true;
-  els.aiChatPanel?.classList.add("open");
-}
-
-function closeAiChat() {
-  state.aiOpen = false;
-  els.aiChatPanel?.classList.remove("open");
-}
-
-function toggleAiChat() {
-  if (state.aiOpen) closeAiChat();
-  else openAiChat();
-}
-
-function openQuiz() {
-  els.quizOverlay?.classList.add("open");
-}
-
-function closeQuiz() {
-  els.quizOverlay?.classList.remove("open");
-}
-
-function nextStep(next, answer) {
-  state.quizAnswers[`step${state.currentQuizStep}`] = answer;
-
-  const current = document.getElementById(`step${state.currentQuizStep}`);
-  const target = document.getElementById(`step${next}`);
-
-  current?.classList.remove("active");
-  target?.classList.add("active");
-
-  state.currentQuizStep = next;
-
-  if (els.quizProgress) {
-    els.quizProgress.style.width = `${(next / 4) * 100}%`;
-  }
-}
-
-function finishQuiz(answer) {
-  state.quizAnswers.step4 = answer;
-  closeQuiz();
-  showToastMsg("✦ Style profile saved! Curating your personalized store now…");
-  setTimeout(() => {
-    state.currentFilter = "all";
-    loadProducts();
-  }, 800);
-}
-
-function bindStaticEvents() {
-  window.addEventListener("scroll", () => {
-    if (!els.nav) return;
-    els.nav.classList.toggle("scrolled", window.scrollY > 24);
-  });
-
-  els.cartBtn?.addEventListener("click", openCart);
-  els.cartOverlay?.addEventListener("click", closeCart);
-
-  document.getElementById("cartClose")?.addEventListener("click", closeCart);
-  document.getElementById("quizBtn")?.addEventListener("click", openQuiz);
-  document.getElementById("openQuiz")?.addEventListener("click", openQuiz);
-  document.getElementById("closeQuiz")?.addEventListener("click", closeQuiz);
-
-  els.aiChatBtn?.addEventListener("click", toggleAiChat);
-  els.aiSend?.addEventListener("click", sendAiMessage);
-  els.aiInput?.addEventListener("keydown", event => {
-    if (event.key === "Enter") sendAiMessage();
-  });
-
-  document.querySelectorAll(".filter-chip").forEach(chip => {
-    chip.addEventListener("click", async () => {
-      document.querySelectorAll(".filter-chip").forEach(c => c.classList.remove("active"));
-      chip.classList.add("active");
-      state.currentFilter = chip.dataset.filter || "all";
-      await loadProducts();
-    });
-  });
-
-  els.sortSelect?.addEventListener("change", async event => {
-    state.currentSort = event.target.value || "featured";
-    await loadProducts();
-  });
-
-  document.addEventListener("mousemove", debounce(event => {
-    const cursor = document.getElementById("cursor");
-    const dot = document.getElementById("cursor-dot");
-    if (cursor) {
-      cursor.style.left = `${event.clientX}px`;
-      cursor.style.top = `${event.clientY}px`;
-    }
-    if (dot) {
-      dot.style.left = `${event.clientX}px`;
-      dot.style.top = `${event.clientY}px`;
-    }
-  }, 8));
-
-  document.addEventListener("mouseover", event => {
-    const target = event.target.closest("a, button, .product-card, .cart-rec-item, .ai-product-mini, .mega-product-card");
-    document.body.classList.toggle("hovering", !!target);
-  });
-
-  document.addEventListener("mousedown", () => {
-    document.body.classList.add("clicking");
-  });
-
-  document.addEventListener("mouseup", () => {
-    document.body.classList.remove("clicking");
-  });
-
-  document.addEventListener("click", async event => {
-    const button = event.target.closest("[data-action]");
-    if (!button) return;
-
-    const action = button.dataset.action;
-    const id = Number(button.dataset.id || 0);
-    const color = button.dataset.color || "";
-    const size = button.dataset.size || "";
-
-    try {
-      if (action === "add-to-cart") {
-        await addToCart(id);
-        return;
-      }
-
-      if (action === "increase-cart-item") {
-        const item = state.cart?.items?.find(x =>
-          x.productId === id &&
-          x.selectedColor === color &&
-          x.selectedSize === size
-        );
-        if (item) {
-          await updateCartQuantity(id, color, size, item.quantity + 1);
-        }
-        return;
-      }
-
-      if (action === "decrease-cart-item") {
-        const item = state.cart?.items?.find(x =>
-          x.productId === id &&
-          x.selectedColor === color &&
-          x.selectedSize === size
-        );
-        if (item) {
-          await updateCartQuantity(id, color, size, Math.max(0, item.quantity - 1));
-        }
-        return;
-      }
-
-      if (action === "remove-cart-item") {
-        await removeCartItem(id, color, size);
-        return;
-      }
-
-      if (action === "select-color") {
-        selectColor(button, id, color);
-        return;
-      }
-
-      if (action === "wishlist") {
-        button.classList.toggle("active");
-        showToastMsg("Saved to wishlist");
-        return;
-      }
-    } catch (error) {
-      console.error(error);
-      showToastMsg(error.message || "Something went wrong.");
-    }
-  });
-
-  document.addEventListener("mousemove", event => {
-    const card = event.target.closest(".product-card");
-    if (card) tiltCard(event, card);
-  });
-
-  document.addEventListener("mouseleave", event => {
-    const card = event.target.closest?.(".product-card");
-    if (card) resetTilt(card);
-  }, true);
-}
-
-function initAnimations() {
-  gsap.fromTo(".hero-badge", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.7, delay: 0.15 });
-  gsap.fromTo(".hero-title", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.9, delay: 0.25 });
-  gsap.fromTo(".hero-subtitle", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.8, delay: 0.42 });
-  gsap.fromTo(".hero-actions", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.8, delay: 0.52 });
-  gsap.fromTo(".hero-scroll", { opacity: 0 }, { opacity: 1, duration: 0.8, delay: 0.9 });
-
-  ScrollTrigger.batch(".section", {
-    onEnter: batch => gsap.to(batch, {
-      opacity: 1,
-      y: 0,
-      duration: 0.8,
-      stagger: 0.12,
-      ease: "power2.out"
-    }),
-    start: "top 88%"
-  });
-}
-
-document.addEventListener("DOMContentLoaded", async () => {
-  bindStaticEvents();
-  initAnimations();
-
-  try {
-    await Promise.all([
-      loadProducts(),
-      loadCategories(),
-      loadSocialProof(),
-      loadLoyalty(),
-      loadCart()
-    ]);
-  } catch (error) {
-    console.error(error);
-    showToastMsg("Initial load failed. Check your API routes.");
-  }
-});
-
-window.openQuiz = openQuiz;
-window.closeQuiz = closeQuiz;
-window.nextStep = nextStep;
-window.finishQuiz = finishQuiz;
-window.openCart = openCart;
-window.closeCart = closeCart;
-window.sendAiMessage = sendAiMessage;
-</script>
+    window.openQuiz = openQuiz;
+    window.closeQuiz = closeQuiz;
+    window.nextStep = nextStep;
+    window.finishQuiz = finishQuiz;
+    window.openCart = openCart;
+    window.closeCart = closeCart;
+    window.sendAiMessage = sendAiMessage;
+  </script>
 </body>
 </html>
