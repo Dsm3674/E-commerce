@@ -12,22 +12,43 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 </head>
 <body>
+  <div class="top-utility-bar">
+    <div class="utility-left">
+      <span>UNITED STATES</span>
+      <span>ENGLISH</span>
+    </div>
+    <div class="utility-right">
+      <span>CLIENT SERVICES</span>
+      <span>STORE LOCATOR</span>
+      <span>SIGN IN</span>
+    </div>
+  </div>
   <nav>
-    <div>NEXSHOP</div>
+    <div>NEXUS MAISON</div>
     <button id="cartBtn">Cart <span id="cartCount" style="display:none"></span></button>
   </nav>
 
   <div id="tickerTrack"></div>
 
   <header class="hero">
+    <div class="hero-image-wrap"></div>
     <div class="hero-inner">
-      <p class="hero-kicker">AI-LUXURY COMMERCE</p>
-      <h1 class="hero-title">NexShop</h1>
+      <p class="hero-kicker">SPRING-SUMMER 2026</p>
+      <h1 class="hero-title">Nexus Maison</h1>
       <p class="hero-subtitle">
-        A curated AI showroom for fashion, tech, beauty, and modern essentials.
+        A curated luxury showroom for the modern age. Discover fine leather goods, accessories, and the art of travel.
       </p>
     </div>
   </header>
+  
+  <section class="the-maison-editorial">
+    <div class="editorial-content">
+      <h2>The Art of Gifting</h2>
+      <p>Explore our curated selection of iconic gifts for every occasion, presented in our signature saffron boxes.</p>
+      <button class="btn-editorial">DISCOVER MORE</button>
+    </div>
+    <div class="editorial-image"></div>
+  </section>
 
   <div id="megaMenu">
     <div id="megaProducts"></div>
@@ -43,11 +64,11 @@
     </select>
 
     <button class="filter-chip active" data-filter="all">All</button>
-    <button class="filter-chip" data-filter="Clothing">Clothing</button>
-    <button class="filter-chip" data-filter="Footwear">Footwear</button>
+    <button class="filter-chip" data-filter="Womens">Women's Wear</button>
+    <button class="filter-chip" data-filter="Mens">Men's Wear</button>
+    <button class="filter-chip" data-filter="Leather">Fine Leather</button>
     <button class="filter-chip" data-filter="Accessories">Accessories</button>
-    <button class="filter-chip" data-filter="Beauty">Beauty</button>
-    <button class="filter-chip" data-filter="Tech">Tech</button>
+    <button class="filter-chip" data-filter="Travel">Art of Travel</button>
 
     <div id="productsGrid"></div>
   </div>
@@ -108,12 +129,82 @@
 
   <div id="quizOverlay">
     <button id="closeQuiz">Close</button>
-    <div id="step1" class="active"></div>
-    <div id="step2"></div>
-    <div id="step3"></div>
-    <div id="step4"></div>
-    <div id="quizProgress" style="width:25%;height:8px;background:#999;"></div>
+    <div id="step1" class="active">
+      <h2>Who are you shopping for?</h2>
+      <div class="quiz-options">
+        <button onclick="nextStep(2, 'self')">Myself</button>
+        <button onclick="nextStep(2, 'women')">Women</button>
+        <button onclick="nextStep(2, 'men')">Men</button>
+      </div>
+    </div>
+    <div id="step2">
+      <h2>What is the primary occasion?</h2>
+      <div class="quiz-options">
+        <button onclick="nextStep(3, 'everyday')">Everyday Elegance</button>
+        <button onclick="nextStep(3, 'travel')">The Art of Travel</button>
+        <button onclick="nextStep(3, 'evening')">Evening & Events</button>
+      </div>
+    </div>
+    <div id="step3">
+      <h2>Select your preferred material:</h2>
+      <div class="quiz-options">
+        <button onclick="nextStep(4, 'monogram')">Signature Canvas</button>
+        <button onclick="nextStep(4, 'leather')">Fine Leather</button>
+        <button onclick="nextStep(4, 'exotic')">Exotics</button>
+      </div>
+    </div>
+    <div id="step4">
+      <h2>Curating your personal showroom</h2>
+      <p style="color:var(--text-soft);margin-top:10px;">Our AI is matching items to your unique profile.</p>
+      <div class="quiz-loader"></div>
+      <button class="btn-editorial" onclick="finishQuiz('done')" style="margin-top:30px">ENTER SHOWROOM</button>
+    </div>
+    <div id="quizProgressWrap">
+      <div id="quizProgress" style="width:25%;"></div>
+    </div>
   </div>
+
+  <footer class="luxury-footer">
+    <div class="footer-top">
+      <div class="footer-col">
+        <h3>HELP & SERVICES</h3>
+        <a href="#">Contact Us</a>
+        <a href="#">FAQ</a>
+        <a href="#">Product Care</a>
+        <a href="#">Stores</a>
+      </div>
+      <div class="footer-col">
+        <h3>SERVICES</h3>
+        <a href="#">Repairs</a>
+        <a href="#">Personalization</a>
+        <a href="#">Art of Gifting</a>
+        <a href="#">Download Apps</a>
+      </div>
+      <div class="footer-col">
+        <h3>ABOUT THE MAISON</h3>
+        <a href="#">Fashion Shows</a>
+        <a href="#">Arts & Culture</a>
+        <a href="#">La Maison</a>
+        <a href="#">Sustainability</a>
+      </div>
+      <div class="footer-col newsletter-col">
+        <h3>NEWSLETTER</h3>
+        <p>Sign up to receive the latest news, updates, and exclusive access.</p>
+        <div class="newsletter-form">
+          <input type="email" placeholder="Email Address" />
+          <button>→</button>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© 2026 Nexus Maison. All Rights Reserved.</div>
+      <div class="footer-legal">
+        <a href="#">Sitemap</a>
+        <a href="#">Legal Notice</a>
+        <a href="#">Privacy Policy</a>
+      </div>
+    </div>
+  </footer>
 
   <div id="cursor"></div>
   <div id="cursor-dot"></div>
@@ -349,7 +440,7 @@
       const featured = state.products.slice(0, 4);
       els.megaProducts.innerHTML = featured.map(product => `
         <div class="mega-product-card" data-action="product-card" data-id="${product.id}">
-          <img src="${product.imageUrl}" alt="${escapeHtml(product.name)}">
+          <img src="${product.imageUrl || '/images/placeholder.png'}" onerror="this.onerror=null;this.src='/images/placeholder.png';" alt="${escapeHtml(product.name)}">
           <div class="mega-product-info">
             <div class="name">${escapeHtml(product.name)}</div>
             <div class="price">${currency(product.price)}</div>
@@ -414,7 +505,7 @@
         return `
           <article class="product-card" id="pc-${product.id}" data-id="${product.id}">
             <div class="product-img-wrap">
-              <img src="${product.imageUrl}" alt="${escapeHtml(product.name)}">
+              <img src="${product.imageUrl || '/images/placeholder.png'}" onerror="this.onerror=null;this.src='/images/placeholder.png';" alt="${escapeHtml(product.name)}">
               <div class="product-badges">
                 ${product.isNew ? `<span class="badge badge-new">New</span>` : ""}
                 ${product.isTrending ? `<span class="badge badge-trending">Trending</span>` : ""}
@@ -519,7 +610,7 @@
         els.cartItems.innerHTML = items.map(item => `
           <div class="cart-item">
             <div class="cart-item-img">
-              <img src="${item.product?.imageUrl || ""}" alt="${escapeHtml(item.product?.name || "Product")}">
+              <img src="${item.product?.imageUrl || '/images/placeholder.png'}" onerror="this.onerror=null;this.src='/images/placeholder.png';" alt="${escapeHtml(item.product?.name || "Product")}">
             </div>
 
             <div class="cart-item-info">
@@ -582,7 +673,7 @@
 
       els.cartRecGrid.innerHTML = state.recommendations.map(product => `
         <div class="cart-rec-item" data-action="add-to-cart" data-id="${product.id}">
-          <img src="${product.imageUrl}" alt="${escapeHtml(product.name)}">
+          <img src="${product.imageUrl || '/images/placeholder.png'}" onerror="this.onerror=null;this.src='/images/placeholder.png';" alt="${escapeHtml(product.name)}">
           <div class="cart-rec-info">
             <div class="n">${escapeHtml(product.name)}</div>
             <div class="p">${currency(product.price)}</div>
@@ -694,7 +785,7 @@
       wrap.className = "ai-msg-products";
       wrap.innerHTML = products.map(product => `
         <div class="ai-product-mini" data-action="add-to-cart" data-id="${product.id}">
-          <img src="${product.imageUrl}" alt="${escapeHtml(product.name)}">
+          <img src="${product.imageUrl || '/images/placeholder.png'}" onerror="this.onerror=null;this.src='/images/placeholder.png';" alt="${escapeHtml(product.name)}">
           <div class="mini-info">
             <div class="mini-name">${escapeHtml(product.name)}</div>
             <div class="mini-price">${currency(product.price)}</div>
