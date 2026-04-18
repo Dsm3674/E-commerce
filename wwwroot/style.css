@@ -786,10 +786,40 @@ section > div[style] {
   max-width: 520px;
 }
 
+.loyalty-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 60px 28px;
+  background: var(--bg-soft);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  margin-top: 40px;
+}
+
+.loyalty-card {
+  width: 100%;
+  max-width: 600px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  padding: 40px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.loyalty-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+
 #tierName {
   font-family: 'Playfair Display', serif;
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 2.2rem;
+  font-weight: 500;
   color: var(--text);
 }
 
@@ -825,17 +855,56 @@ section > div[style] {
 
 #aiChatBtn {
   position: fixed;
-  right: 22px;
-  bottom: 22px;
+  right: 28px;
+  bottom: 28px;
   z-index: 120;
-  min-width: 120px;
-  min-height: 48px;
-  padding: 0 18px;
-  border-radius: 999px;
-  border-color: transparent;
-  color: white;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  box-shadow: 0 16px 34px rgba(69, 202, 255, 0.24);
+  min-width: 140px;
+  min-height: 50px;
+  padding: 0 20px;
+  border-radius: 0;
+  border: 1px solid var(--text);
+  color: var(--bg);
+  background: var(--text);
+  box-shadow: var(--shadow-lg);
+  text-transform: uppercase;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  transition: all 0.3s ease;
+}
+
+#aiChatBtn:hover {
+  background: var(--bg);
+  color: var(--text);
+}
+
+#quizBtn {
+  position: fixed;
+  left: 28px;
+  bottom: 28px;
+  z-index: 120;
+  min-width: 140px;
+  min-height: 50px;
+  padding: 0 20px;
+  border-radius: 0;
+  border: 1px solid var(--text);
+  color: var(--text);
+  background: var(--bg);
+  box-shadow: var(--shadow-lg);
+  text-transform: uppercase;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  transition: all 0.3s ease;
+}
+
+#quizBtn:hover {
+  background: var(--text);
+  color: var(--bg);
+}
+
+#openQuiz {
+  display: none;
 }
 
 #aiChatPanel {
